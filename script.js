@@ -1,4 +1,6 @@
 let currentShape = "circle";
+let AUDIO_PlAYER1 = new Audio("/sound/player1.mp3")
+let AUDIO_PLAYER2 = new Audio("/sound/player2.mp3")
 
 function init() {
   render();
@@ -87,6 +89,7 @@ function generateCircleSVG() {
         </circle>
       </svg>
     `;
+    AUDIO_PlAYER1.play();
 
   return svgHtml;
 }
@@ -120,6 +123,7 @@ function generateCrossSVG() {
         </g>
       </svg>
     `;
+     AUDIO_PLAYER2.play();
 
   return svgHtml;
 }
@@ -157,10 +161,9 @@ function drawWinLine(startIndex, endIndex) {
   const container = document.body;
 
   const line = document.createElement("div");
-  line.style.position = "absolute";
-  line.style.backgroundColor = "white";
-  line.style.height = "5px";
-  line.style.borderRadius = "3px";
+  line.classList.add("line");
+
+  
 
   const x1 = startRect.left + startRect.width / 2;
   const y1 = startRect.top + startRect.height / 2;
@@ -196,11 +199,8 @@ function restartGame() {
   currentShape = "circle";
 
   // Gewinnlinie(n) entfernen
-  document.querySelectorAll("body > div").forEach((el) => {
-    if (el.style.position === "absolute") {
-      el.remove();
-    }
-  });
+  document.querySelectorAll(".line").forEach((el) => el.remove());
+
 
   // Neu rendern
   render();
