@@ -1,13 +1,9 @@
 let currentShape = "circle";
-let AUDIO_PlAYER1 = new Audio("/sound/player1.mp3")
-let AUDIO_PLAYER2 = new Audio("/sound/player2.mp3")
+let AUDIO_PlAYER1 = new Audio("sound/player1.mp3")
+let AUDIO_PLAYER2 = new Audio("sound/player2.mp3")
 
 function init() {
   render();
-}
-
-function render() {
-  const contentDiv = document.getElementById("content");
 }
 
 function render() {
@@ -152,36 +148,37 @@ function checkWin() {
 }
 
 function drawWinLine(startIndex, endIndex) {
-  const startCell = document.querySelectorAll("td")[startIndex];
-  const endCell = document.querySelectorAll("td")[endIndex];
-
-  const startRect = startCell.getBoundingClientRect();
-  const endRect = endCell.getBoundingClientRect();
-
-  const container = document.body;
-
-  const line = document.createElement("div");
-  line.classList.add("line");
-
+    const startCell = document.querySelectorAll("td")[startIndex];
+    const endCell = document.querySelectorAll("td")[endIndex];
   
-
-  const x1 = startRect.left + startRect.width / 2;
-  const y1 = startRect.top + startRect.height / 2;
-  const x2 = endRect.left + endRect.width / 2;
-  const y2 = endRect.top + endRect.height / 2;
-
-  const length = Math.hypot(x2 - x1, y2 - y1);
-  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-
-  line.style.width = `${length}px`;
-  line.style.transform = `rotate(${angle}deg)`;
-  line.style.left = `${x1}px`;
-  line.style.top = `${y1}px`;
-  line.style.transformOrigin = "left center";
-  line.style.zIndex = "1000";
-
-  container.appendChild(line);
-}
+    const contentRect = document.getElementById("content").getBoundingClientRect();
+  
+    const startRect = startCell.getBoundingClientRect();
+    const endRect = endCell.getBoundingClientRect();
+  
+    const container = document.getElementById("content");
+  
+    const line = document.createElement("div");
+    line.classList.add("line");
+  
+    const x1 = startRect.left + startRect.width / 2 - contentRect.left;
+    const y1 = startRect.top + startRect.height / 2 - contentRect.top;
+    const x2 = endRect.left + endRect.width / 2 - contentRect.left;
+    const y2 = endRect.top + endRect.height / 2 - contentRect.top;
+  
+    const length = Math.hypot(x2 - x1, y2 - y1);
+    const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+  
+    line.style.width = `${length}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    line.style.left = `${x1}px`;
+    line.style.top = `${y1}px`;
+    line.style.transformOrigin = "left center";
+    line.style.zIndex = "1000";
+  
+    container.appendChild(line);
+  }
+  
 
 function disableAllClicks() {
   document.querySelectorAll("td").forEach((td) => {
@@ -203,5 +200,38 @@ function restartGame() {
 
 
   // Neu rendern
+  document.getElementById("winner-text").textContent = "";
+document.getElementById("winner-text").style.opacity = "0";
+
   render();
+  
 }
+
+function checkWin() {
+    const winLines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6],
+    ];
+  
+    for (const [a, b, c] of winLines) {
+      if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) {
+        drawWinLine(a, c);
+        disableAllClicks();
+  
+        // Anzeige, wer gewonnen hat
+        const winner = fields[a] === "circle" ? "⭕ Kreis hat gewonnen!" : "❌ Kreuz hat gewonnen!";
+        showWinnerText(winner);
+  
+        return true;
+      }
+    }
+  
+    return false;
+  }
+  function showWinnerText(text) {
+    const winnerText = document.getElementById("winner-text");
+    winnerText.textContent = text;
+    winnerText.style.opacity = "1";
+  }
+    
