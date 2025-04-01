@@ -1,4 +1,4 @@
-let currentShape = 'circle';
+let currentShape = "circle";
 
 function init() {
   render();
@@ -9,55 +9,56 @@ function render() {
 }
 
 function render() {
-    const contentDiv = document.getElementById('content');
-    let tableHtml = '<table>';
-    for (let i = 0; i < 3; i++) {
-        tableHtml += '<tr>';
-        for (let j = 0; j < 3; j++) {
-            const index = i * 3 + j;
-            let symbol = '';
-            if (fields[index] === 'circle') {
-                symbol = generateCircleSVG();
-            } else if (fields[index] === 'cross') {
-                symbol = generateCrossSVG();
-            }
+  const contentDiv = document.getElementById("content");
+  let tableHtml = "<table>";
+  for (let i = 0; i < 3; i++) {
+    tableHtml += "<tr>";
+    for (let j = 0; j < 3; j++) {
+      const index = i * 3 + j;
+      let symbol = "";
+      if (fields[index] === "circle") {
+        symbol = generateCircleSVG();
+      } else if (fields[index] === "cross") {
+        symbol = generateCrossSVG();
+      }
 
-            // onclick hinzufügen, wenn das Feld noch leer ist
-            const clickHandler = fields[index] === null
-                ? `onclick="handleClick(this, ${index})"`
-                : '';
+      // onclick hinzufügen, wenn das Feld noch leer ist
+      const clickHandler =
+        fields[index] === null ? `onclick="handleClick(this, ${index})"` : "";
 
-            tableHtml += `<td ${clickHandler}>${symbol}</td>`;
-        }
-        tableHtml += '</tr>';
+      tableHtml += `<td ${clickHandler}>${symbol}</td>`;
     }
-    tableHtml += '</table>';
-    contentDiv.innerHTML = tableHtml;
+    tableHtml += "</tr>";
+  }
+  tableHtml += "</table>";
+  contentDiv.innerHTML = tableHtml;
 }
 
 function handleClick(tdElement, index) {
-    // Setze das Feld im Array
-    fields[index] = currentShape;
+  // Setze das Feld im Array
+  fields[index] = currentShape;
 
-    // Füge das SVG ins angeklickte td ein
-    tdElement.innerHTML = currentShape === 'circle' ? generateCircleSVG() : generateCrossSVG();
+  // Füge das SVG ins angeklickte td ein
+  tdElement.innerHTML =
+    currentShape === "circle" ? generateCircleSVG() : generateCrossSVG();
 
-    // Entferne onclick-Funktion
-    tdElement.onclick = null;
+  // Entferne onclick-Funktion
+  tdElement.onclick = null;
 
-    // Wechsle zur nächsten Form
-    currentShape = currentShape === 'circle' ? 'cross' : 'circle';
+  // Wechsle zur nächsten Form
+  currentShape = currentShape === "circle" ? "cross" : "circle";
+
+  checkWin();
 }
 
-
 function generateCircleSVG() {
-    const color = '#00B0EF';
-    const width = 70;
-    const height = 70;
-    const radius = width / 2 - 4;
-    const circumference = 2 * Math.PI * radius;
-  
-    const svgHtml = `
+  const color = "#00B0EF";
+  const width = 70;
+  const height = 70;
+  const radius = width / 2 - 4;
+  const circumference = 2 * Math.PI * radius;
+
+  const svgHtml = `
       <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
         <circle
           cx="${width / 2}"
@@ -86,16 +87,16 @@ function generateCircleSVG() {
         </circle>
       </svg>
     `;
-  
-    return svgHtml;
-  }
 
-  function generateCrossSVG() {
-    const color = '#FFC000';
-    const width = 70;
-    const height = 70;
-  
-    const svgHtml = `
+  return svgHtml;
+}
+
+function generateCrossSVG() {
+  const color = "#FFC000";
+  const width = 70;
+  const height = 70;
+
+  const svgHtml = `
       <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
         <g transform="rotate(0 ${width / 2} ${height / 2})">
           <line x1="10" y1="10" x2="60" y2="60"
@@ -119,7 +120,88 @@ function generateCircleSVG() {
         </g>
       </svg>
     `;
-  
-    return svgHtml;
+
+  return svgHtml;
+}
+
+function checkWin() {
+  const winLines = [
+    [0, 1, 2], // oben
+    [3, 4, 5], // mitte
+    [6, 7, 8], // unten
+    [0, 3, 6], // links
+    [1, 4, 7], // mitte
+    [2, 5, 8], // rechts
+    [0, 4, 8], // diagonal \
+    [2, 4, 6], // diagonal /
+  ];
+
+  for (const [a, b, c] of winLines) {
+    if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) {
+      drawWinLine(a, c); // Start und Ende der Linie
+      disableAllClicks(); // kein weiterer Zug möglich
+      return true;
+    }
   }
-  
+
+  return false;
+}
+
+function drawWinLine(startIndex, endIndex) {
+  const startCell = document.querySelectorAll("td")[startIndex];
+  const endCell = document.querySelectorAll("td")[endIndex];
+
+  const startRect = startCell.getBoundingClientRect();
+  const endRect = endCell.getBoundingClientRect();
+
+  const container = document.body;
+
+  const line = document.createElement("div");
+  line.style.position = "absolute";
+  line.style.backgroundColor = "white";
+  line.style.height = "5px";
+  line.style.borderRadius = "3px";
+
+  const x1 = startRect.left + startRect.width / 2;
+  const y1 = startRect.top + startRect.height / 2;
+  const x2 = endRect.left + endRect.width / 2;
+  const y2 = endRect.top + endRect.height / 2;
+
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+  line.style.width = `${length}px`;
+  line.style.transform = `rotate(${angle}deg)`;
+  line.style.left = `${x1}px`;
+  line.style.top = `${y1}px`;
+  line.style.transformOrigin = "left center";
+  line.style.zIndex = "1000";
+
+  container.appendChild(line);
+}
+
+function disableAllClicks() {
+  document.querySelectorAll("td").forEach((td) => {
+    td.onclick = null;
+  });
+}
+
+function restartGame() {
+  // Spielfeld zurücksetzen
+  for (let i = 0; i < fields.length; i++) {
+    fields[i] = null;
+  }
+
+  // Spieler zurücksetzen
+  currentShape = "circle";
+
+  // Gewinnlinie(n) entfernen
+  document.querySelectorAll("body > div").forEach((el) => {
+    if (el.style.position === "absolute") {
+      el.remove();
+    }
+  });
+
+  // Neu rendern
+  render();
+}

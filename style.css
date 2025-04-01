@@ -50,3 +50,20 @@ td:first-child {
 td:last-child {
     border-right: none;
 }
+
+#restart-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: white;
+    color: #323232;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+#restart-btn:hover {
+    background-color: #dddddd;
+}
